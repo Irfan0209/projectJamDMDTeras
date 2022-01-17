@@ -2,7 +2,7 @@
  * PROGMEM DATA
  ==============================================*/
   // sholatN 9 x 8 
-  const char static sholatN_E[] PROGMEM = { "IMSAK\0\0\0"
+/*  const char static sholatN_E[] PROGMEM = { "IMSAK\0\0\0"
                                             "SUBUH\0\0\0" 
                                             "TERBT\0\0\0"  
                                             "DHUHA\0\0\0"   
@@ -25,6 +25,7 @@
                                             "SYAWAL\0\0\0\0\0" 
                                             "DZULQA'DAH\0" 
                                             "DZULHIJAH\0\0"};
+                                            
   //m_month 12 x 10
   const char static m_month_E[] PROGMEM = { "JAN\0"      
                                             "FEB\0"       
@@ -39,13 +40,13 @@
                                             "NOV\0" 
                                             "DES\0"};
   //DayName 7 x 7                                        
-  const char static DayName_E[] PROGMEM = { "MINGGU\0\0\0"
+  const char static DayName_E[] PROGMEM = { "AHAD\0\0\0"
                                             "SENIN\0\0"
                                             "SELASA\0" 
                                             "RABU\0\0\0" 
                                             "KAMIS\0\0" 
                                             "JUM'AT\0" 
-                                            "SABTU\0\0"};
+                                            "SABTU\0\0"};   
 
   //MT_Name 4 x 10
   const char static MT_Name_E[] PROGMEM = { "MASJID\0\0\0\0"   
@@ -83,7 +84,7 @@
 // 5. Masehi Month Name     : drawHijrDate(OutPut String)
 // 6. Masjid Name           : drawMasjidName(OutPut String)    depend on Masjid Tipe  1-Masjid 2-Musholla 3-Surau 4-Langgar
  ==============================================*/ 
-char* msgPuasa(int hd, int ty) // get sholat name from EEPROM
+/*char* msgPuasa(int hd, int ty) // get sholat name from EEPROM
     {
       static char output[50];
       char  hdBuff[26];
@@ -95,131 +96,37 @@ char* msgPuasa(int hd, int ty) // get sholat name from EEPROM
       sprintf(output,"%s %s ESOK HARI" ,hdBuff,tyBuff);
       return output;
     }
+*/
 
 char* sholatN(int number) // get sholat name from EEPROM
     {
       static char  locBuff[8];
-      int locLen = number*8;
-      memccpy_P(locBuff,sholatN_E+locLen  ,0,8);
-      return locBuff;
-    }
-
-char * DayName(int number)  // get Day Name from EEPROM
-    {
-      static char  locBuff[7];
-      int locLen = (number-1)*7;
-      memccpy_P(locBuff,DayName_E+locLen  ,0,7);
-      return locBuff;
-    }
-
-char * MonthName(int number)  // get  Month Name from EEPROM
-    {
-      static char  locBuff[4];
-      int   locLen = (number-1)*4;
-      memccpy_P(locBuff,m_month_E+locLen,0,4);
+      sprintf(locBuff,"%s" ,sholatCall[number]);
       return locBuff;
     }
 
 char * drawDayDate()
   {
-      char  locBuff[20];
-      static char  out[45];
-      int   locLen = (nowH.hM-1)*11;
-      memccpy_P(locBuff,h_month_E+locLen,0,11);
-      sprintf(out,"%s %s,%02d-%02d-%04d   %02d %s %dH\0",DayName(daynow),pasar[jumlahhari()%5],now.day(),now.month(),now.year(),nowH.hD,locBuff,nowH.hY);
+      static char  out[100];
+      sprintf(out,"%s %s %02d-%02d-%04d  %02d-%s-%dH\0",daysOfTheWeek[daynow-1],pasar[jumlahhari()%5],now.day(),now.month(),now.year(),nowH.hD,mounthJawa[nowH.hM-1],nowH.hY);
+      //Serial.println();
       return out;
   }
 
 char *  drawTextOut()
   {
-      
+      //Disp.setFont(angka_besar_kuru);
       static char  out[80];
-      char nama[80] = "SELAMAT MENUNAIKAN IBADAH PUASA";
+      char nama[80] = "Ds.TANJUNGSARI Dsn.NGAMPEL RT16/RW02 TAMAN SIDOARJO";
       sprintf(out,"%s\0",nama);
       return out;
   }
- 
-char *  drawInfo(int addr)
+
+ /*char *  drawTextAdzan()
   {
-      static char  out[150] = " " ;
-      //EEPROM.get(addr,out);
+      //Disp.setFont(angka_besar_kuru);
+      static char  out[80];
+      char nama[80] = "selamat menunaikan ibadah sholat";
+      sprintf(out,"%s\0",nama);
       return out;
-  }
-
- void dwCek(const char* msg, int Speed, int dDT, int DrawAdd) //ranning tanggalan single
-  { 
-    // check RunSelector
-    static uint16_t   x; 
-    if(!dwDo(DrawAdd)) return;
-    if (reset_x !=0) { x=0;reset_x = 0;}    
-      
-      char  locBuff[20];
-      static char  TGLNSL[45];
-      int   locLen = (nowH.hM-1)*11;
-      memccpy_P(locBuff,h_month_E+locLen,0,11);
-      
-       
-    static uint16_t   lsRn;
-    int fullScroll = Disp.textWidth(msg) + DWidth;    
-    uint16_t          Tmr = millis();
-    if((Tmr-lsRn)> Speed)
-      { lsRn=Tmr;
-        if (x < fullScroll) {++x;}
-        else {  dwDone(DrawAdd); 
-                x = 0;return;}
-     if(dDT==1)
-        {
-        fType(1);  //Marquee    jam yang tampil di bawah
-        Disp.drawText(DWidth - x, 0, msg); //runing teks diatas
-        fType(1);
-        if (x<=6)                     { drawGreg_TS(16-x);}
-        else if (x>=(fullScroll-6))   { drawGreg_TS(16-(fullScroll-x));}
-        else                          { 
-          //Disp.drawRect(1,8,30,8);//garis tengah
-                                        drawGreg_TS(9);}//posisi jamnya yang bawah
-        }
-     else if(dDT==2) //jam yang diatas
-        {    
-        fType(1);
-        if (x<=6)                     { drawTgl(x-6);}
-        else if (x>=(fullScroll-6))   { drawTgl((fullScroll-x)-6);}
-        else                          { 
-          //Disp.drawRect(1,7,30,7);//garis tengah
-                                        drawTgl(0);}  //posisi jam nya yang diatas
-        fType(1); //Marquee  running teks dibawah
-        Disp.drawText(DWidth - x, 9 , msg);//runinng teks dibawah
-        }
-     else
-        {
-        fType(1);
-    //    Disp.drawLine(1,2,62,2);  nampilkan garis
-     //   Disp.drawLine(1,13,62,13); //nampilkan garis
-     //   Disp.drawText(DWidth - x, 4, msg);
-        }
-        DoSwap = true; 
-      }          
-  }
-
-
-  char * TGLJAWA()
-{
-      update_All_data();
-      char  locBuff[20];
-      static char  out[45];
-      int   locLen = (nowH.hM-1)*11;
-      memccpy_P(locBuff,h_month_E+locLen,0,11);
-      sprintf(out,"%02d-%s-%dH\0",nowH.hD,locBuff,nowH.hY);
-      return out;     
-             
-  }
-
-  void drawTgl(uint16_t y)   // Draw tanggal nasional
-  {
-    char  locBuff[20];
-      static char  out[30];
-      int   locLen = (nowH.hM-1)*11;
-      memccpy_P(locBuff,h_month_E+locLen,0,11);
-      sprintf(out,"%02d-%02d-%04d",now.day(),now.month(),now.year());   
-    dwCtr(2,y,out);
-    DoSwap = true; 
-  }
+  }*/

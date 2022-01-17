@@ -11,7 +11,7 @@
 // Main Function
 void sholatCal()
   {
-    float EJD = E_Julian_date(now.year(),now.month(),now.day(),longitude);
+    float EJD = E_Julian_date(now.year(),now.month(),now.day(),Prm.L_LO);
     float Decl=Dql(EJD);
     float EqOfTime=EqT(EJD);
     Pray_Time(timezone,latitude, longitude,Prm.L_AL,Decl, EqOfTime );
@@ -173,7 +173,6 @@ hijir_date toHijri(uint16_t Y, uint8_t M, uint8_t D,uint8_t cor) // core --> cor
 
     return BuffDate;
   }
-
 
 /*
 hijir_date toHijri(int  g_y, int  g_m, int  g_d,int cor )
